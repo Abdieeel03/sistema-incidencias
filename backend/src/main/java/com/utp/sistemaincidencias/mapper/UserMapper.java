@@ -34,7 +34,6 @@ public class UserMapper {
 		User user = new User();
 		user.setName(dto.getName());
 		user.setEmail(dto.getEmail());
-		user.setPasswordHash(dto.getPasswordHash());
 		user.setRole(dto.getRole());
 		user.setIsActive(dto.getIsActive() != null ? dto.getIsActive() : true);
 		return user;
@@ -48,9 +47,7 @@ public class UserMapper {
 		user.setName(dto.getName());
 		user.setEmail(dto.getEmail());
 		user.setRole(dto.getRole());
-		if (dto.getPasswordHash() != null) {
-			user.setPasswordHash(dto.getPasswordHash());
-		}
+
 		if (dto.getIsActive() != null) {
 			user.setIsActive(dto.getIsActive());
 		}

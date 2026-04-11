@@ -34,6 +34,22 @@ public class SectionAssignmentMapper {
 			return null;
 		}
 
+		if (dto.getSectionId() == null) {
+			throw new IllegalArgumentException("SectionId is required");
+		}
+
+		if (dto.getStudentId() == null) {
+			throw new IllegalArgumentException("StudentId is required");
+		}
+
+		if (dto.getClassId() == null) {
+			throw new IllegalArgumentException("ClassId is required");
+		}
+
+		if (dto.getAssignedById() == null) {
+			throw new IllegalArgumentException("AssignedId is required");
+		}
+
 		SectionAssignment assignment = new SectionAssignment();
 		assignment.setStudent(toStudentReference(dto.getStudentId()));
 		assignment.setSection(toSectionReference(dto.getSectionId()));
@@ -47,10 +63,21 @@ public class SectionAssignmentMapper {
 			return;
 		}
 
-		assignment.setStudent(toStudentReference(dto.getStudentId()));
-		assignment.setSection(toSectionReference(dto.getSectionId()));
-		assignment.setSchoolClass(toSchoolClassReference(dto.getClassId()));
-		assignment.setAssignedBy(toUserReference(dto.getAssignedById()));
+		if (dto.getSectionId() != null) {
+			assignment.setSection(toSectionReference(dto.getSectionId()));
+		}
+
+		if (dto.getStudentId() != null) {
+			assignment.setStudent(toStudentReference(dto.getStudentId()));
+		}
+
+		if (dto.getClassId() != null) {
+			assignment.setSchoolClass(toSchoolClassReference(dto.getClassId()));
+		}
+
+		if (dto.getAssignedById() != null) {
+			assignment.setAssignedBy(toUserReference(dto.getAssignedById()));
+		}
 	}
 
 	public List<SectionAssignmentResponseDTO> toResponseDTOList(List<SectionAssignment> assignments) {

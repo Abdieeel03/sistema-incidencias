@@ -37,6 +37,18 @@ public class IncidentMapper {
 			return null;
 		}
 
+		if (dto.getStudentId() == null) {
+			throw new IllegalArgumentException("StudentId is required!");
+		}
+
+		if (dto.getClassId() == null) {
+			throw new IllegalArgumentException("ClassId is required!");
+		}
+
+		if (dto.getReportedById() == null) {
+			throw new IllegalArgumentException("ReportedById is required!");
+		}
+
 		Incident incident = new Incident();
 		incident.setTitle(dto.getTitle());
 		incident.setDescription(dto.getDescription());
@@ -55,13 +67,20 @@ public class IncidentMapper {
 
 		incident.setTitle(dto.getTitle());
 		incident.setDescription(dto.getDescription());
-		incident.setStudent(toStudentReference(dto.getStudentId()));
-		incident.setSchoolClass(toSchoolClassReference(dto.getClassId()));
-		incident.setReportedBy(toUserReference(dto.getReportedById()));
-		if (dto.getStatus() != null) {
-			incident.setStatus(dto.getStatus());
-		}
+		incident.setStatus(dto.getStatus() != null ? dto.getStatus() : IncidentStatus.abierta);
 		incident.setIncidentDate(dto.getIncidentDate());
+
+		if (dto.getStudentId() != null) {
+			incident.setStudent(toStudentReference(dto.getStudentId()));
+		}
+
+		if (dto.getClassId() != null) {
+			incident.setSchoolClass(toSchoolClassReference(dto.getClassId()));
+		}
+
+		if (dto.getReportedById() != null) {
+			incident.setReportedBy(toUserReference(dto.getReportedById()));
+		}
 	}
 
 	public List<IncidentResponseDTO> toResponseDTOList(List<Incident> incidents) {
