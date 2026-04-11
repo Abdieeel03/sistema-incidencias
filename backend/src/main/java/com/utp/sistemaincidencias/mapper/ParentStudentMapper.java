@@ -30,6 +30,14 @@ public class ParentStudentMapper {
 			return null;
 		}
 
+		if (dto.getParentId() == null) {
+			throw new IllegalArgumentException("ParentStudentId is required");
+		}
+
+		if (dto.getStudentId() == null) {
+			throw new IllegalArgumentException("StudentId is required");
+		}
+
 		ParentStudent parentStudent = new ParentStudent();
 		parentStudent.setParent(toUserReference(dto.getParentId()));
 		parentStudent.setStudent(toStudentReference(dto.getStudentId()));
@@ -41,8 +49,13 @@ public class ParentStudentMapper {
 			return;
 		}
 
-		parentStudent.setParent(toUserReference(dto.getParentId()));
-		parentStudent.setStudent(toStudentReference(dto.getStudentId()));
+		if (dto.getParentId() != null) {
+			parentStudent.setParent(toUserReference(dto.getParentId()));
+		}
+
+		if (dto.getStudentId() != null) {
+			parentStudent.setStudent(toStudentReference(dto.getStudentId()));
+		}
 	}
 
 	public List<ParentStudentResponseDTO> toResponseDTOList(List<ParentStudent> parentStudents) {

@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class IncidentReadMapper {
+public class IncidentReadReceiptMapper {
 
 	public IncidentReadReceiptResponseDTO toResponseDTO(IncidentReadReceipt receipt) {
 		if (receipt == null) {

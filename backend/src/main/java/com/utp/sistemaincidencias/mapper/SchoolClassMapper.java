@@ -33,6 +33,14 @@ public class SchoolClassMapper {
 			return null;
 		}
 
+		if (dto.getTeacherId() == null) {
+			throw new IllegalArgumentException("TeacherId is required");
+		}
+
+		if (dto.getSectionId() == null) {
+			throw new IllegalArgumentException("SectionId is required");
+		}
+
 		SchoolClass schoolClass = new SchoolClass();
 		schoolClass.setName(dto.getName());
 		schoolClass.setDescription(dto.getDescription());
@@ -48,8 +56,13 @@ public class SchoolClassMapper {
 
 		schoolClass.setName(dto.getName());
 		schoolClass.setDescription(dto.getDescription());
-		schoolClass.setTeacher(toUserReference(dto.getTeacherId()));
-		schoolClass.setSection(toSectionReference(dto.getSectionId()));
+
+		if (dto.getTeacherId() != null) {
+			schoolClass.setTeacher(toUserReference(dto.getTeacherId()));
+		}
+		if (dto.getSectionId() != null) {
+			schoolClass.setSection(toSectionReference(dto.getSectionId()));
+		}
 	}
 
 	public List<SchoolClassResponseDTO> toResponseDTOList(List<SchoolClass> classes) {

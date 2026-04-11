@@ -32,6 +32,10 @@ public class SectionMapper {
 			return null;
 		}
 
+		if (dto.getCoordinatorId() == null) {
+			throw new IllegalArgumentException("CoordinatorId is required");
+		}
+
 		Section section = new Section();
 		section.setName(dto.getName());
 		section.setGrade(dto.getGrade());
@@ -48,7 +52,10 @@ public class SectionMapper {
 		section.setName(dto.getName());
 		section.setGrade(dto.getGrade());
 		section.setCapacity(dto.getCapacity());
-		section.setCoordinator(toUserReference(dto.getCoordinatorId()));
+
+		if (dto.getCoordinatorId() != null) {
+			section.setCoordinator(toUserReference(dto.getCoordinatorId()));
+		}
 	}
 
 	public List<SectionResponseDTO> toResponseDTOList(List<Section> sections) {
