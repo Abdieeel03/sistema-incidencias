@@ -1,5 +1,7 @@
 package com.utp.sistemaincidencias.service.impl;
 
+import com.utp.sistemaincidencias.dto.SchoolClassRequestDTO;
+import com.utp.sistemaincidencias.mapper.SchoolClassMapper;
 import com.utp.sistemaincidencias.model.SchoolClass;
 import com.utp.sistemaincidencias.repository.SchoolClassRepository;
 import com.utp.sistemaincidencias.repository.UserRepository;
@@ -19,6 +21,7 @@ public class SchoolClassServiceImpl implements SchoolClassService {
     private final SchoolClassRepository schoolClassRepository;
     private final UserRepository userRepository;
     private final SectionRepository sectionRepository;
+    private final SchoolClassMapper schoolClassMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -40,24 +43,23 @@ public class SchoolClassServiceImpl implements SchoolClassService {
 
     @Override
     @Transactional
-    public SchoolClass createClass(SchoolClass schoolClass) {
-        if (!userRepository.existsById(schoolClass.getTeacher().getId())) {
-            throw new RuntimeException("El profesor con ID " + schoolClass.getTeacher().getId() + " no existe");
+    public SchoolClass createClass(SchoolClassRequestDTO dto) {
+        if (!userRepository.existsById(dto.getTeacherId())) {
+            throw new RuntimeException("El profesor con ID " + dto.getTeacherId() + " no existe");
         }
-        if (!sectionRepository.existsById(schoolClass.getSection().getId())) {
-            throw new RuntimeException("La sección con ID " + schoolClass.getSection().getId() + " no existe");
+        if (!sectionRepository.existsById(dto.getSectionId())) {
+            throw new RuntimeException("La sección con ID " + dto.getSectionId() + " no existe");
         }
+
+        SchoolClass schoolClass = schoolClassMapper.toEntity(dto);
         return schoolClassRepository.save(schoolClass);
     }
 
     @Override
     @Transactional
-    public SchoolClass updateClass(Long id, SchoolClass classDetails) {
+    public SchoolClass updateClass(Long id, SchoolClassRequestDTO dto) {
         return schoolClassRepository.findById(id).map(schoolClass -> {
-            schoolClass.setName(classDetails.getName());
-            schoolClass.setDescription(classDetails.getDescription());
-            schoolClass.setTeacher(classDetails.getTeacher());
-            schoolClass.setSection(classDetails.getSection());
+            schoolClassMapper.updateEntity(dto, schoolClass);
             return schoolClassRepository.save(schoolClass);
         }).orElseThrow(() -> new RuntimeException("Clase no encontrada con id: " + id));
     }

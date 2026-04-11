@@ -1,5 +1,7 @@
 package com.utp.sistemaincidencias.service.impl;
 
+import com.utp.sistemaincidencias.dto.IncidentRequestDTO;
+import com.utp.sistemaincidencias.mapper.IncidentMapper;
 import com.utp.sistemaincidencias.model.Incident;
 import com.utp.sistemaincidencias.model.enums.IncidentStatus;
 import com.utp.sistemaincidencias.repository.IncidentRepository;
@@ -22,6 +24,7 @@ public class IncidentServiceImpl implements IncidentService {
     private final StudentRepository studentRepository;
     private final UserRepository userRepository;
     private final SchoolClassRepository schoolClassRepository;
+    private final IncidentMapper incidentMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -49,28 +52,29 @@ public class IncidentServiceImpl implements IncidentService {
 
     @Override
     @Transactional
-    public Incident createIncident(Incident incident) {
-        if (!studentRepository.existsById(incident.getStudent().getId())) {
-            throw new RuntimeException("El estudiante con ID " + incident.getStudent().getId() + " no existe");
+    public Incident createIncident(IncidentRequestDTO dto) {
+        if (!studentRepository.existsById(dto.getStudentId())) {
+            throw new RuntimeException("El estudiante con ID " + dto.getStudentId() + " no existe");
         }
 
-        if (!userRepository.existsById(incident.getReportedBy().getId())) {
+        if (!userRepository.existsById(dto.getReportedById())) {
             throw new RuntimeException(
-                    "El usuario reportero con ID " + incident.getReportedBy().getId() + " no existe");
+                    "El usuario reportero con ID " + dto.getReportedById() + " no existe");
         }
 
-        if (!schoolClassRepository.existsById(incident.getSchoolClass().getId())) {
-            throw new RuntimeException("La clase con ID " + incident.getSchoolClass().getId() + " no existe");
+        if (!schoolClassRepository.existsById(dto.getClassId())) {
+            throw new RuntimeException("La clase con ID " + dto.getClassId() + " no existe");
         }
 
+        Incident incident = incidentMapper.toEntity(dto);
         return incidentRepository.save(incident);
     }
 
     @Override
     @Transactional
-    public Incident updateIncidentStatus(Long id, IncidentStatus status) {
+    public Incident updateIncident(Long id, IncidentRequestDTO dto) {
         return incidentRepository.findById(id).map(incident -> {
-            incident.setStatus(status);
+            incidentMapper.updateEntity(dto, incident);
             return incidentRepository.save(incident);
         }).orElseThrow(() -> new RuntimeException("Incidencia no encontrada con id: " + id));
     }

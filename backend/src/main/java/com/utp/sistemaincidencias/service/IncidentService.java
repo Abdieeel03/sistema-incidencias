@@ -1,5 +1,6 @@
 package com.utp.sistemaincidencias.service;
 
+import com.utp.sistemaincidencias.dto.IncidentRequestDTO;
 import com.utp.sistemaincidencias.model.Incident;
 import com.utp.sistemaincidencias.model.enums.IncidentStatus;
 import java.util.List;
@@ -10,7 +11,7 @@ public interface IncidentService {
     Optional<Incident> getIncidentById(Long id);
     List<Incident> getIncidentsByStudent(Long studentId);
     List<Incident> getIncidentsByStatus(IncidentStatus status);
-    Incident createIncident(Incident incident);
-    Incident updateIncidentStatus(Long id, IncidentStatus status);
+    Incident createIncident(IncidentRequestDTO dto);
+    Incident updateIncident(Long id, IncidentRequestDTO dto);
     void deleteIncident(Long id);
 }

@@ -8,10 +8,13 @@ import com.utp.sistemaincidencias.model.Student;
 import com.utp.sistemaincidencias.model.User;
 import com.utp.sistemaincidencias.model.enums.IncidentStatus;
 
+import org.springframework.stereotype.Component;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+@Component
 public class IncidentMapper {
 
 	public IncidentResponseDTO toResponseDTO(Incident incident) {

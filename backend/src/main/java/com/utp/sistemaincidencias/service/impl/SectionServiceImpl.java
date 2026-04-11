@@ -1,5 +1,7 @@
 package com.utp.sistemaincidencias.service.impl;
 
+import com.utp.sistemaincidencias.dto.SectionRequestDTO;
+import com.utp.sistemaincidencias.mapper.SectionMapper;
 import com.utp.sistemaincidencias.model.Section;
 import com.utp.sistemaincidencias.repository.SectionRepository;
 import com.utp.sistemaincidencias.repository.UserRepository;
@@ -17,6 +19,7 @@ public class SectionServiceImpl implements SectionService {
 
     private final SectionRepository sectionRepository;
     private final UserRepository userRepository;
+    private final SectionMapper sectionMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -32,21 +35,20 @@ public class SectionServiceImpl implements SectionService {
 
     @Override
     @Transactional
-    public Section createSection(Section section) {
-        if (!userRepository.existsById(section.getCoordinator().getId())) {
-            throw new RuntimeException("El coordinador con ID " + section.getCoordinator().getId() + " no existe");
+    public Section createSection(SectionRequestDTO dto) {
+        if (!userRepository.existsById(dto.getCoordinatorId())) {
+            throw new RuntimeException("El coordinador con ID " + dto.getCoordinatorId() + " no existe");
         }
+
+        Section section = sectionMapper.toEntity(dto);
         return sectionRepository.save(section);
     }
 
     @Override
     @Transactional
-    public Section updateSection(Long id, Section sectionDetails) {
+    public Section updateSection(Long id, SectionRequestDTO dto) {
         return sectionRepository.findById(id).map(section -> {
-            section.setName(sectionDetails.getName());
-            section.setGrade(sectionDetails.getGrade());
-            section.setCapacity(sectionDetails.getCapacity());
-            section.setCoordinator(sectionDetails.getCoordinator());
+            sectionMapper.updateEntity(dto, section);
             return sectionRepository.save(section);
         }).orElseThrow(() -> new RuntimeException("Sección no encontrada con id: " + id));
     }

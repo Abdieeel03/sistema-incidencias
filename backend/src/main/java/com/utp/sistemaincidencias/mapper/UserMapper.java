@@ -4,10 +4,13 @@ import com.utp.sistemaincidencias.dto.UserRequestDTO;
 import com.utp.sistemaincidencias.dto.UserResponseDTO;
 import com.utp.sistemaincidencias.model.User;
 
+import org.springframework.stereotype.Component;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+@Component
 public class UserMapper {
 
 	public UserResponseDTO toResponseDTO(User user) {

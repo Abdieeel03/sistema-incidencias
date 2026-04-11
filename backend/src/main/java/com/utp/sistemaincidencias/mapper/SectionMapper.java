@@ -5,10 +5,13 @@ import com.utp.sistemaincidencias.dto.SectionResponseDTO;
 import com.utp.sistemaincidencias.model.Section;
 import com.utp.sistemaincidencias.model.User;
 
+import org.springframework.stereotype.Component;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+@Component
 public class SectionMapper {
 
 	public SectionResponseDTO toResponseDTO(Section section) {

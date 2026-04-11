@@ -1,5 +1,7 @@
 package com.utp.sistemaincidencias.service.impl;
 
+import com.utp.sistemaincidencias.dto.UserRequestDTO;
+import com.utp.sistemaincidencias.mapper.UserMapper;
 import com.utp.sistemaincidencias.model.User;
 import com.utp.sistemaincidencias.repository.UserRepository;
 import com.utp.sistemaincidencias.service.UserService;
@@ -15,6 +17,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -36,22 +39,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public User createUser(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
+    public User createUser(UserRequestDTO dto) {
+        if (userRepository.existsByEmail(dto.getEmail())) {
             throw new RuntimeException("El email ya está registrado");
         }
+
+        User user = userMapper.toEntity(dto);
+        String password = dto.getPassword();
+        user.setPasswordHash(password);
+        // El hash de la password se tendría que usar con Spring Security
         return userRepository.save(user);
     }
 
     @Override
     @Transactional
-    public User updateUser(Long id, User userDetails) {
+    public User updateUser(Long id, UserRequestDTO dto) {
         return userRepository.findById(id).map(user -> {
-            user.setName(userDetails.getName());
-            user.setEmail(userDetails.getEmail());
-            user.setRole(userDetails.getRole());
-            user.setIsActive(userDetails.getIsActive());
-            // El hash de la password se tendria que usar con spring security
+            userMapper.updateEntity(dto, user);
             return userRepository.save(user);
         }).orElseThrow(() -> new RuntimeException("Usuario no encontrado con id: " + id));
     }

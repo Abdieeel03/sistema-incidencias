@@ -6,10 +6,13 @@ import com.utp.sistemaincidencias.model.Incident;
 import com.utp.sistemaincidencias.model.IncidentReadReceipt;
 import com.utp.sistemaincidencias.model.User;
 
+import org.springframework.stereotype.Component;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+@Component
 public class IncidentReadReceiptMapper {
 
 	public IncidentReadReceiptResponseDTO toResponseDTO(IncidentReadReceipt receipt) {

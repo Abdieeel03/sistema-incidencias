@@ -1,5 +1,7 @@
 package com.utp.sistemaincidencias.service.impl;
 
+import com.utp.sistemaincidencias.dto.StudentRequestDTO;
+import com.utp.sistemaincidencias.mapper.StudentMapper;
 import com.utp.sistemaincidencias.model.Student;
 import com.utp.sistemaincidencias.repository.StudentRepository;
 import com.utp.sistemaincidencias.service.StudentService;
@@ -15,6 +17,7 @@ import java.util.Optional;
 public class StudentServiceImpl implements StudentService {
 
     private final StudentRepository studentRepository;
+    private final StudentMapper studentMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -36,22 +39,20 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     @Transactional
-    public Student createStudent(Student student) {
-        if (studentRepository.existsByStudentCode(student.getStudentCode())) {
+    public Student createStudent(StudentRequestDTO dto) {
+        if (studentRepository.existsByStudentCode(dto.getStudentCode())) {
             throw new RuntimeException("El código de estudiante ya existe");
         }
+
+        Student student = studentMapper.toEntity(dto);
         return studentRepository.save(student);
     }
 
     @Override
     @Transactional
-    public Student updateStudent(Long id, Student studentDetails) {
+    public Student updateStudent(Long id, StudentRequestDTO dto) {
         return studentRepository.findById(id).map(student -> {
-            student.setFirstName(studentDetails.getFirstName());
-            student.setLastName(studentDetails.getLastName());
-            student.setBirthDate(studentDetails.getBirthDate());
-            student.setStudentCode(studentDetails.getStudentCode());
-            student.setIsActive(studentDetails.getIsActive());
+            studentMapper.updateEntity(dto, student);
             return studentRepository.save(student);
         }).orElseThrow(() -> new RuntimeException("Estudiante no encontrado con id: " + id));
     }
