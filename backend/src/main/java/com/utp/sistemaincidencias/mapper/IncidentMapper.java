@@ -67,7 +67,11 @@ public class IncidentMapper {
 
 		incident.setTitle(dto.getTitle());
 		incident.setDescription(dto.getDescription());
-		incident.setStatus(dto.getStatus() != null ? dto.getStatus() : IncidentStatus.abierta);
+
+		if (dto.getStatus() != null) {
+			incident.setStatus(dto.getStatus());
+		}
+
 		incident.setIncidentDate(dto.getIncidentDate());
 
 		if (dto.getStudentId() != null) {
