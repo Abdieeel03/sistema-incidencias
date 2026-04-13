@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Document</title>
+</head>
+<body>
+
+    <h1>Editar Usuario</h1>
+
+    <form id="editForm">
+        <input type="text" id="name">
+        <input type="email" id="email">
+        <input type="password" id="password">
+        <input type="text" id="role">
+        <button type="submit">Actualizar</button>
+    </form>
+
+    <script src="../../assets/js/api.js"></script>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get("id");
+
+        async function loadUser() {
+            const user = await getData(`users/${id}`);
+
+            document.getElementById("name").value = user.name;
+            document.getElementById("email").value = user.email;
+            document.getElementById("password").value = user.password;
+            document.getElementById("role").value = user.role;
+        }
+
+        document.getElementById("editForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const data = {
+                name: document.getElementById("name").value,
+                email: document.getElementById("email").value,
+                password: document.getElementById("password").value,
+                role: document.getElementById("role").value
+            };
+
+            await putData(`users/${id}`, data);
+
+            alert("Usuario actualizado");
+            window.location.href = "list.html";
+        });
+
+        loadUser();
+    </script>
+
+</body>
+</html>
