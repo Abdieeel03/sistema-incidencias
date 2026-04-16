@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Document</title>
+</head>
+<body>
+
+    <div class="container mt-4">
+        <h1>Relación Padres - Estudiantes</h1>
+
+        <button class="btn btn-success mb-3" onclick="openCreateModal()">
+            Asignar Padre a Estudiante
+        </button>
+
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Padre</th>
+                <th>Estudiante</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody id="parentStudentTable"></tbody>
+        </table>
+    </div>
+
+    <div class="modal fade" id="parentStudentModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 id="modalTitle">Asignar</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <form id="parentStudentForm">
+
+                        <select id="parentId" class="form-control mb-2"></select>
+                        <select id="studentId" class="form-control mb-2"></select>
+
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-success" onclick="saveParentStudent()">Guardar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="../../assets/js/api.js"></script>
+    <script src="../../assets/js/parentStudents.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
