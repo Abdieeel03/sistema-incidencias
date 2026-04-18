@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Document</title>
+</head>
+<body>
+
+    <div class="container mt-4">
+        <h1>Usuarios</h1>
+
+        <div class="d-flex mb-3">
+            <input type="text" id="searchEmail" class="form-control me-2" placeholder="Buscar por email">
+            <button class="btn btn-primary" onclick="searchUser()">Buscar</button>
+        </div>
+
+        <button class="btn btn-success mb-3" onclick="openCreateModal()">Crear Usuario</button>
+
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>En línea</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody id="userTable"></tbody>
+        </table>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="userModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <form id="userForm">
+                        <input type="hidden" id="userId">
+
+                        <div class="mb-2">
+                            <input type="text" id="name" class="form-control" placeholder="Nombre" required>
+                        </div>
+
+                        <div class="mb-2">
+                            <input type="email" id="email" class="form-control" placeholder="Email" required>
+                        </div>
+
+                        <div class="mb-2" id="passwordGroup">
+                            <input type="password" id="password" class="form-control" placeholder="Password" required>
+                        </div>
+
+                        <div class="mb-2">
+                            <select id="role" class="form-control">
+                                <option value="coordinador">Coordinador</option>
+                                <option value="profesor">Profesor</option>
+                                <option value="padre">Padre de familia</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-success" onclick="saveUser()">Guardar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function searchUser() {
+            const email = document.getElementById("searchEmail").value;
+
+            if (!email) {
+                loadUsers();
+                return;
+            }
+
+            try {
+                const user = await getData(`users/email/${email}`);
+
+                const table = document.getElementById("userTable");
+                table.innerHTML = `
+                    <tr>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td>${user.role}</td>
+                        <td>${user.isActive ? "Activo" : "Inactivo"}</td>
+                        <td class="text-center">
+                            <button class="btn btn-warning btn-sm" onclick="openEditModal(${user.id})">Editar</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteUser(${user.id})">Eliminar</button>
+                        </td>
+                    </tr>
+                `;
+            } catch (error) {
+                alert("Usuario no encontrado");
+            }
+        }
+    </script>
+
+    <script src="../../assets/js/api.js"></script>
+    <script src="../../assets/js/users.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

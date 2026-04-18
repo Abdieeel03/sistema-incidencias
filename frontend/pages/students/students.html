@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Document</title>
+</head>
+<body>
+
+    <div class="container mt-4">
+        <h1>Estudiantes</h1>
+
+        <div class="d-flex mb-3">
+            <input type="text" id="searchCodigo" class="form-control me-2" placeholder="Buscar por código del estudiante">
+            <button class="btn btn-primary" onclick="searchStudent()">Buscar</button>
+        </div>
+
+        <button class="btn btn-success mb-3" onclick="openCreateModal()">Crear Estudiante</button>
+
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Nombres</th>
+                    <th>Apellidos</th>
+                    <th>Fecha de Cumpleaños</th>
+                    <th>Código Estudiante</th>
+                    <th>En línea</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="studentTable"></tbody>
+        </table>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="studentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Estudiantes</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                
+                <div class="modal-body">
+                    <form id="studentForm">
+                        <input type="hidden" id="studentId">
+
+                        <div class="mb-2">
+                            <input type="text" id="firstName" class="form-control" placeholder="Nombres del estudiante" required>
+                        </div>
+                        <div class="mb-2">
+                            <input type="text" id="lastName" class="form-control" placeholder="Apellidos estudiante" required>
+                        </div>
+                        <div class="mb-2">
+                            <input type="date" id="birthDate" class="form-control" placeholder="Fecha de cumpleaño" required>
+                        </div>
+                        <div class="mb-2">
+                            <input type="text" id="studentCode" class="form-control" placeholder="código de estudiante" required>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-success" onclick="saveStudent()">Guardar</button>
+                </div>
+            </div>            
+        </div>
+    </div>
+
+    <script>
+        async function searchStudent() {
+            const studentCode = document.getElementById("searchCodigo").value;
+
+            if (!studentCode) {
+                loadStudents();
+                return;
+            }
+
+            try{
+                const student = await getData(`students/code/${studentCode}`);
+
+                const table = document.getElementById("studentTable");
+                table.innerHTML = `
+                    <tr>
+                        <td>${student.firstName}</td>
+                        <td>${student.lastName}</td>
+                        <td>${student.birthDate}</td>
+                        <td>${student.studentCode}</td>
+                        <td>${student.isActive ? "Activo" : "Inactivo"}</td>
+                        <td class="text-center">
+                            <button class="btn btn-warning btn-sm" onclick="openEditModal(${student.id})">Editar</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteStudent(${student.id})">Eliminar</button>
+                        </td>
+                    </tr>
+                `;
+            } catch (error){
+                alert("Estudiante no encontrado");
+            }
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../assets/js/api.js"></script>
+    <script src="../../assets/js/students.js"></script>
+
+</body>
+</html>
