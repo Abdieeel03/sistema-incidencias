@@ -21,7 +21,7 @@ async function loadSections() {
                 <td>${s.grade}</td>
                 <td>${s.capacity}</td>
                 <td>${coordinator ? coordinator.name : "N/A"}</td>
-                <td>
+                <td class="text-center">
                     <button class="btn btn-warning btn-sm" onclick="openEditModal(${s.id})">Editar</button>
                     <button class="btn btn-danger btn-sm" onclick="deleteSection(${s.id})">Eliminar</button>
                 </td>
