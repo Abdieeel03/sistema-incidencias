@@ -80,7 +80,10 @@
         async function searchUser() {
             const email = document.getElementById("searchEmail").value;
 
-            if (!email) return;
+            if (!email) {
+                loadUsers();
+                return;
+            }
 
             try {
                 const user = await getData(`users/email/${email}`);

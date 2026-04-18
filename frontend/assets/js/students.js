@@ -15,15 +15,12 @@ async function loadStudents(){
         students.forEach(student => {
             table.innerHTML += `
                 <tr>
-                    <td>${student.id}</td>
                     <td>${student.firstName}</td>
                     <td>${student.lastName}</td>
                     <td>${student.birthDate}</td>
                     <td>${student.studentCode}</td>
-                    <td>${student.isActive}</td>
-                    <td>${student.createdAt}</td>
-                    <td>${student.updatedAt}</td>
-                    <td>
+                    <td>${student.isActive ? "Activo" : "Inactivo"}</td>
+                    <td class="text-center">
                         <button class="btn btn-warning btn-sm" onclick="openEditModal(${student.id})">Editar</button>
                         <button class="btn btn-danger btn-sm" onclick="deleteStudent(${student.id})">Eliminar</button>
                     </td>
@@ -45,27 +42,40 @@ function openCreateModal() {
 }
 
 async function openEditModal(id){
-    editing = true;
 
+    editing = true;
     const student = await getData(`students/${id}`);
+
     document.getElementById("studentId").value = student.id;
     document.getElementById("firstName").value = student.firstName;
     document.getElementById("lastName").value = student.lastName;
     document.getElementById("birthDate").value = student.birthDate;
     document.getElementById("studentCode").value = student.studentCode;
     document.getElementById("modalTitle").innerText = "Editar Estudiante";
+
     modal.show();
 }
 
 async function saveStudent() {
     const id = document.getElementById("studentId").value;
+    const firstName = document.getElementById("firstName").value.trim();
+    const lastName = document.getElementById("lastName").value.trim();
+    const birthDate = document.getElementById("birthDate").value.trim();
+    const studentCode = document.getElementById("studentCode").value.trim();
+
+    if (!firstName || !lastName || !birthDate || !studentCode) {
+        alert("Todos los campos son obligatorios");
+        return;
+    }
+
     const data = {
-        firstName: document.getElementById("firstName").value,
-        lastName: document.getElementById("lastName").value,
-        birthDate: document.getElementById("birthDate").value,
-        studentCode: document.getElementById("studentCode").value,
+        firstName: firstName,
+        lastName: lastName,
+        birthDate: birthDate,
+        studentCode: studentCode,
         isActive: true
     };
+
     try {
         if (editing) {
             await putData(`students/${id}`, data);
@@ -76,7 +86,7 @@ async function saveStudent() {
         loadStudents();
     } catch (error) {
         console.error(error);
-        alert("Error al guardar usuario")
+        alert("Error al guardar estudiante")
     }
 }
 
