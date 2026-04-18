@@ -1,12 +1,14 @@
 let modal;
 let editing = false;
+let usersCache = [];
+let sectionsCache = [];
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     modal = new bootstrap.Modal(document.getElementById("classModal"));
 
-    loadClasses();
-    loadUsers();
-    loadSections();
+    await loadUsers();
+    await loadSections();
+    await loadClasses();
 });
 
 async function loadClasses() {
@@ -16,14 +18,17 @@ async function loadClasses() {
     table.innerHTML = "";
 
     classes.forEach(c => {
+
+        const teacher = usersCache.find(u => u.id === c.teacherId);
+        const section = sectionsCache.find(s => s.id === c.sectionId);
+
         table.innerHTML += `
             <tr>
-                <td>${c.id}</td>
                 <td>${c.name}</td>
                 <td>${c.description || ""}</td>
-                <td>${c.teacher?.name || "N/A"}</td>
-                <td>${c.section?.name || "N/A"}</td>
-                <td>
+                <td>${teacher ? teacher.name : "N/A"}</td>
+                <td>${section ? section.grade + " - " + section.name : "N/A"}</td>
+                <td class="text-center">
                     <button class="btn btn-warning btn-sm" onclick="openEditModal(${c.id})">Editar</button>
                     <button class="btn btn-danger btn-sm" onclick="deleteClass(${c.id})">Eliminar</button>
                 </td>
@@ -34,21 +39,24 @@ async function loadClasses() {
 
 async function loadUsers() {
     const users = await getData("users");
+    usersCache = users;
     const select = document.getElementById("teacherId");
-
     select.innerHTML = "";
-    users.forEach(u => {
-        select.innerHTML += `<option value="${u.id}">${u.name}</option>`;
-    });
+
+    users.filter(u => u.role === "profesor")
+        .forEach(u => {
+            select.innerHTML += `<option value="${u.id}">${u.name}</option>`;
+        });
 }
 
 async function loadSections() {
     const sections = await getData("sections");
+    sectionsCache = sections;
     const select = document.getElementById("sectionId");
-
     select.innerHTML = "";
+
     sections.forEach(s => {
-        select.innerHTML += `<option value="${s.id}">${s.name}</option>`;
+        select.innerHTML += `<option value="${s.id}">${s.grade} - ${s.name}</option>`;
     });
 }
 
@@ -76,23 +84,34 @@ async function openEditModal(id) {
 }
 
 async function saveClass() {
+
     const id = document.getElementById("classId").value;
-
-    const data = {
-        name: document.getElementById("name").value,
-        description: document.getElementById("description").value,
-        teacherId: document.getElementById("teacherId").value,
-        sectionId: document.getElementById("sectionId").value
-    };
-
-    if (editing) {
-        await putData(`classes/${id}`, data);
-    } else {
-        await postData("classes", data);
+    const name = document.getElementById("name").value.trim();
+    const description = document.getElementById("description").value.trim();
+    const teacherId = document.getElementById("teacherId").value;
+    const sectionId = document.getElementById("sectionId").value;
+    if (!name || !teacherId || !sectionId) {
+        alert("Todos los campos son obligatorios");
+        return;
     }
-
-    modal.hide();
-    loadClasses();
+    const data = {
+        name: name,
+        description: description,
+        teacherId: teacherId,
+        sectionId: sectionId
+    };
+    try {
+        if (editing) {
+            await putData(`classes/${id}`, data);
+        } else {
+            await postData("classes", data);
+        }
+        modal.hide();
+        loadClasses();
+    } catch (error) {
+        console.error(error);
+        alert("Error al guardar clase");
+    }
 }
 
 async function deleteClass(id) {

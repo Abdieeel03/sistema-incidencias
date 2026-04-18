@@ -1,27 +1,26 @@
 let modal;
+let parentsCache = [];
+let studentsCache = [];
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     modal = new bootstrap.Modal(document.getElementById("parentStudentModal"));
-
-    loadParentStudents();
-    loadParents();
-    loadStudents();
+    await loadParents();
+    await loadStudents();
+    await loadParentStudents();
 });
 
 async function loadParentStudents() {
     const list = await getData("parent-students");
     const table = document.getElementById("parentStudentTable");
-
     table.innerHTML = "";
-
     list.forEach(ps => {
+        const parent = parentsCache.find(p => p.id === ps.parentId);
+        const student = studentsCache.find(s => s.id === ps.studentId);
         table.innerHTML += `
             <tr>
-                <td>${ps.id}</td>
-                <td>${ps.parent?.name || "N/A"}</td>
-                <td>${ps.student?.firstName} ${ps.student?.lastName}</td>
-                <td>${ps.createdAt}</td>
-                <td>
+                <td>${parent ? parent.name : "N/A"}</td>
+                <td>${student ? student.firstName + " " + student.lastName : "N/A"}</td>
+                <td class="text-center">
                     <button class="btn btn-danger btn-sm" onclick="deleteParentStudent(${ps.id})">
                         Eliminar
                     </button>
@@ -33,29 +32,21 @@ async function loadParentStudents() {
 
 async function loadParents() {
     const users = await getData("users");
+    parentsCache = users.filter(u => u.role === "padre");
     const select = document.getElementById("parentId");
-
     select.innerHTML = "";
-
-    users
-        .filter(u => u.role === "PADRE")
-        .forEach(u => {
-            select.innerHTML += `<option value="${u.id}">${u.name}</option>`;
-        });
+    parentsCache.forEach(u => {
+        select.innerHTML += `<option value="${u.id}">${u.name}</option>`;
+    });
 }
 
 async function loadStudents() {
     const students = await getData("students");
+    studentsCache = students;
     const select = document.getElementById("studentId");
-
     select.innerHTML = "";
-
     students.forEach(s => {
-        select.innerHTML += `
-            <option value="${s.id}">
-                ${s.firstName} ${s.lastName}
-            </option>
-        `;
+        select.innerHTML += `<option value="${s.id}">${s.firstName} ${s.lastName}</option>`;
     });
 }
 
@@ -65,14 +56,15 @@ function openCreateModal() {
 }
 
 async function saveParentStudent() {
-    const data = {
-        parentId: document.getElementById("parentId").value,
-        studentId: document.getElementById("studentId").value
-    };
-
+    const parentId = document.getElementById("parentId").value;
+    const studentId = document.getElementById("studentId").value;
+    if (!parentId || !studentId) {
+        alert("Todos los campos son obligatorios");
+        return;
+    }
+    const data = { parentId, studentId };
     try {
         await postData("parent-students", data);
-
         modal.hide();
         loadParentStudents();
     } catch (error) {
