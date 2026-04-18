@@ -1,27 +1,27 @@
 let modal;
+let incidentsCache = [];
+let usersCache = [];
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     modal = new bootstrap.Modal(document.getElementById("receiptModal"));
-
-    loadReceipts();
-    loadIncidents();
-    loadParents();
+    await loadIncidents();
+    await loadParents();
+    await loadReceipts();
 });
 
 async function loadReceipts() {
     const receipts = await getData("incident-receipts");
     const table = document.getElementById("receiptTable");
-
     table.innerHTML = "";
-
     receipts.forEach(r => {
+        const incident = incidentsCache.find(i => i.id === r.incidentId);
+        const parent = usersCache.find(u => u.id === r.parentId);
         table.innerHTML += `
             <tr>
-                <td>${r.id}</td>
-                <td>${r.incident?.title || "N/A"}</td>
-                <td>${r.parent?.name || "N/A"}</td>
-                <td>${r.readAt}</td>
-                <td>
+                <td>${incident ? incident.title : "N/A"}</td>
+                <td>${parent ? parent.name : "N/A"}</td>
+                <td>${r.readAt || ""}</td>
+                <td class"text-center">
                     <button class="btn btn-danger btn-sm" onclick="deleteReceipt(${r.id})">
                         Eliminar
                     </button>
@@ -33,10 +33,9 @@ async function loadReceipts() {
 
 async function loadIncidents() {
     const incidents = await getData("incidents");
+    incidentsCache = incidents;
     const select = document.getElementById("incidentId");
-
-    select.innerHTML = "";
-
+    select.innerHTML = `<option value="">Seleccione incidencia</option>`;
     incidents.forEach(i => {
         select.innerHTML += `
             <option value="${i.id}">
@@ -48,12 +47,11 @@ async function loadIncidents() {
 
 async function loadParents() {
     const users = await getData("users");
+    usersCache = users;
     const select = document.getElementById("parentId");
-
-    select.innerHTML = "";
-
+    select.innerHTML = `<option value="">Seleccione padre</option>`;
     users
-        .filter(u => u.role === "PADRE")
+        .filter(u => u.role === "padre")
         .forEach(u => {
             select.innerHTML += `<option value="${u.id}">${u.name}</option>`;
         });
@@ -65,9 +63,17 @@ function openCreateModal() {
 }
 
 async function saveReceipt() {
+    const incidentId = document.getElementById("incidentId").value;
+    const parentId = document.getElementById("parentId").value;
+
+    if (!incidentId || !parentId) {
+        alert("Todos los campos son obligatorios");
+        return;
+    }
+
     const data = {
-        incidentId: document.getElementById("incidentId").value,
-        parentId: document.getElementById("parentId").value
+        incidentId: parseInt(incidentId),
+        parentId: parseInt(parentId)
     };
 
     try {
