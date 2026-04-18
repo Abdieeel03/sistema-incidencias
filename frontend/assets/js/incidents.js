@@ -1,29 +1,33 @@
 let modal;
 let editing = false;
+let studentsCache = [];
+let classesCache = [];
+let usersCache = [];
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     modal = new bootstrap.Modal(document.getElementById("incidentModal"));
 
-    loadIncidents();
-    loadStudents();
-    loadClasses();
-    loadUsers();
+    await loadStudents();
+    await loadClasses();
+    await loadUsers();
+    await loadIncidents();
 });
 
 async function loadIncidents() {
     const incidents = await getData("incidents");
     const table = document.getElementById("incidentTable");
-
     table.innerHTML = "";
-
     incidents.forEach(i => {
+        const student = studentsCache.find(s => s.id === i.studentId);
+        const schoolClass = classesCache.find(c => c.id === i.classId);
+        const user = usersCache.find(u => u.id === i.reportedById);
         table.innerHTML += `
             <tr>
-                <td>${i.id}</td>
                 <td>${i.title}</td>
-                <td>${i.student?.firstName} ${i.student?.lastName}</td>
-                <td>${i.schoolClass?.name}</td>
-                <td>${i.reportedBy?.name}</td>
+                <td>${i.description}</td>
+                <td>${student ? student.firstName + " " + student.lastName : "N/A"}</td>
+                <td>${schoolClass ? schoolClass.name : "N/A"}</td>
+                <td>${user ? user.name : "N/A"}</td>
                 <td>${i.status}</td>
                 <td>${i.incidentDate}</td>
                 <td>
@@ -37,8 +41,8 @@ async function loadIncidents() {
 
 async function loadStudents() {
     const students = await getData("students");
+    studentsCache = students;
     const select = document.getElementById("studentId");
-
     select.innerHTML = "";
     students.forEach(s => {
         select.innerHTML += `<option value="${s.id}">${s.firstName} ${s.lastName}</option>`;
@@ -47,8 +51,8 @@ async function loadStudents() {
 
 async function loadClasses() {
     const classes = await getData("classes");
+    classesCache = classes;
     const select = document.getElementById("classId");
-
     select.innerHTML = "";
     classes.forEach(c => {
         select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
@@ -57,10 +61,10 @@ async function loadClasses() {
 
 async function loadUsers() {
     const users = await getData("users");
+    usersCache = users.filter(u => u.role === "profesor" || u.role === "coordinador");
     const select = document.getElementById("reportedBy");
-
     select.innerHTML = "";
-    users.forEach(u => {
+    usersCache.forEach(u => {
         select.innerHTML += `<option value="${u.id}">${u.name}</option>`;
     });
 }
@@ -75,7 +79,6 @@ function openCreateModal() {
 
 async function openEditModal(id) {
     editing = true;
-
     const i = await getData(`incidents/${id}`);
 
     document.getElementById("incidentId").value = i.id;
@@ -92,26 +95,39 @@ async function openEditModal(id) {
 }
 
 async function saveIncident() {
+
     const id = document.getElementById("incidentId").value;
-
-    const data = {
-        title: document.getElementById("title").value,
-        description: document.getElementById("description").value,
-        studentId: document.getElementById("studentId").value,
-        classId: document.getElementById("classId").value,
-        reportedBy: document.getElementById("reportedBy").value,
-        status: document.getElementById("status").value,
-        incidentDate: document.getElementById("incidentDate").value
-    };
-
-    if (editing) {
-        await putData(`incidents/${id}`, data);
-    } else {
-        await postData("incidents", data);
+    const title = document.getElementById("title").value.trim();
+    const description = document.getElementById("description").value.trim();
+    const studentId = document.getElementById("studentId").value;
+    const classId = document.getElementById("classId").value;
+    const reportedById = document.getElementById("reportedBy").value;
+    const incidentDate = document.getElementById("incidentDate").value;
+    if (!title || !description || !studentId || !classId || !reportedById || !incidentDate) {
+        alert("Todos los campos son obligatorios");
+        return;
     }
-
-    modal.hide();
-    loadIncidents();
+    const data = {
+        title,
+        description,
+        studentId,
+        classId,
+        reportedById,
+        status: document.getElementById("status").value,
+        incidentDate
+    };
+    try {
+        if (editing) {
+            await putData(`incidents/${id}`, data);
+        } else {
+            await postData("incidents", data);
+        }
+        modal.hide();
+        loadIncidents();
+    } catch (error) {
+        console.error(error);
+        alert("Error al guardar incidencia");
+    }
 }
 
 async function deleteIncident(id) {
