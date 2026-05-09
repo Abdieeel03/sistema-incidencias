@@ -28,6 +28,18 @@ public class SecurityConfig {
     @Value("${app.cors.allowed-headers}")
     private List<String> allowedHeaders;
 
+    @Value("${app.cors.exposed-headers}")
+    private List<String> exposedHeaders;
+
+    @Value("${app.cors.allow-credentials}")
+    private boolean allowCredentials;
+
+    @Value("${app.docs.public-enabled}")
+    private boolean publicDocsEnabled;
+
+    @Value("${app.cors.max-age}")
+    private long maxAge;
+
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -37,6 +49,9 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/api/v1/users/**").permitAll();
+                    if (publicDocsEnabled) {
+                        auth.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll();
+                    }
                     auth.anyRequest().authenticated();
                 })
                 .build();
@@ -48,6 +63,9 @@ public class SecurityConfig {
         configuration.setAllowedOriginPatterns(allowedOrigins);
         configuration.setAllowedHeaders(allowedHeaders);
         configuration.setAllowedMethods(allowedMethods);
+        configuration.setExposedHeaders(exposedHeaders);
+        configuration.setAllowCredentials(allowCredentials);
+        configuration.setMaxAge(maxAge);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
