@@ -33,8 +33,8 @@ public class UserController {
     }
 
     @GetMapping("/email/{email}")
-    public ResponseEntity<UserResponseDTO> getUserByEmail(@PathVariable String email) {
-        return userService.getUserByEmail(email)
+    public ResponseEntity<UserResponseDTO> getUserByDni(@PathVariable String dni) {
+        return userService.getUserByDni(dni)
                 .map(user -> ResponseEntity.ok(userMapper.toResponseDTO(user)))
                 .orElse(ResponseEntity.notFound().build());
     }

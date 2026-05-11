@@ -33,4 +33,4 @@ build/
 .vscode/
 
 ### ENVIROMENT ###
-.env
+../../../Descargas/backend-incidencias/.env

@@ -12,7 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserRequestDTO {
 	private String name;
-	private String email;
+	private String dni;
 	private String password;
 	private UserRole role;
 	private Boolean isActive;

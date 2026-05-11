@@ -17,7 +17,7 @@ class UserTest {
         assertNotNull(user);
         assertNull(user.getId());
         assertNull(user.getName());
-        assertNull(user.getEmail());
+        assertNull(user.getDni());
         assertNull(user.getPasswordHash());
         assertNull(user.getRole());
         assertTrue(user.getIsActive());
@@ -32,13 +32,14 @@ class UserTest {
         List<Section> sections = new ArrayList<>();
         List<SchoolClass> classes = new ArrayList<>();
 
-        User user = new User(1L, "Juan", "juan@mail.com", "hash123",
+        User user = new User(1L, "C123", "Juan", "12345678", "hash123",
                 UserRole.coordinador, true, now, now,
                 parentStudents, sections, classes);
 
         assertEquals(1L, user.getId());
+        assertEquals("C123", user.getUsername());
         assertEquals("Juan", user.getName());
-        assertEquals("juan@mail.com", user.getEmail());
+        assertEquals("12345678", user.getDni());
         assertEquals("hash123", user.getPasswordHash());
         assertEquals(UserRole.coordinador, user.getRole());
         assertTrue(user.getIsActive());
@@ -56,7 +57,7 @@ class UserTest {
 
         user.setId(5L);
         user.setName("Maria");
-        user.setEmail("maria@mail.com");
+        user.setDni("12345678");
         user.setPasswordHash("secret");
         user.setRole(UserRole.profesor);
         user.setIsActive(false);
@@ -65,7 +66,7 @@ class UserTest {
 
         assertEquals(5L, user.getId());
         assertEquals("Maria", user.getName());
-        assertEquals("maria@mail.com", user.getEmail());
+        assertEquals("12345678", user.getDni());
         assertEquals("secret", user.getPasswordHash());
         assertEquals(UserRole.profesor, user.getRole());
         assertFalse(user.getIsActive());

@@ -84,39 +84,39 @@ class UserServiceImplTest {
     @Test
     void testGetUserByEmailFound() {
         User user = new User();
-        user.setEmail("juan@mail.com");
+        user.setDni("12345678");
 
-        when(userRepository.findByEmail("juan@mail.com")).thenReturn(Optional.of(user));
+        when(userRepository.findByDni("12345678")).thenReturn(Optional.of(user));
 
-        Optional<User> result = userService.getUserByEmail("juan@mail.com");
+        Optional<User> result = userService.getUserByDni("12345678");
 
         assertTrue(result.isPresent());
-        assertEquals("juan@mail.com", result.get().getEmail());
-        verify(userRepository, times(1)).findByEmail("juan@mail.com");
+        assertEquals("12345678", result.get().getDni());
+        verify(userRepository, times(1)).findByDni("12345678");
     }
 
     @Test
     void testGetUserByEmailNotFound() {
-        when(userRepository.findByEmail("noexiste@mail.com")).thenReturn(Optional.empty());
+        when(userRepository.findByDni("12345678")).thenReturn(Optional.empty());
 
-        Optional<User> result = userService.getUserByEmail("noexiste@mail.com");
+        Optional<User> result = userService.getUserByDni("12345678");
 
         assertFalse(result.isPresent());
-        verify(userRepository, times(1)).findByEmail("noexiste@mail.com");
+        verify(userRepository, times(1)).findByDni("12345678");
     }
 
     @Test
     void testCreateUserSuccess() {
-        UserRequestDTO dto = new UserRequestDTO("Juan", "juan@mail.com",
+        UserRequestDTO dto = new UserRequestDTO("Juan", "12345678",
                 "pass123", UserRole.coordinador, true);
         User mappedUser = new User();
         mappedUser.setName("Juan");
-        mappedUser.setEmail("juan@mail.com");
+        mappedUser.setDni("12345678");
         User savedUser = new User();
         savedUser.setId(1L);
         savedUser.setName("Juan");
 
-        when(userRepository.existsByEmail("juan@mail.com")).thenReturn(false);
+        when(userRepository.existsByDni("12345678")).thenReturn(false);
         when(userMapper.toEntity(dto)).thenReturn(mappedUser);
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
@@ -124,29 +124,29 @@ class UserServiceImplTest {
 
         assertNotNull(result);
         assertEquals(1L, result.getId());
-        verify(userRepository, times(1)).existsByEmail("juan@mail.com");
+        verify(userRepository, times(1)).existsByDni("12345678");
         verify(userMapper, times(1)).toEntity(dto);
         verify(userRepository, times(1)).save(any(User.class));
     }
 
     @Test
     void testCreateUserDuplicateEmail() {
-        UserRequestDTO dto = new UserRequestDTO("Juan", "duplicado@mail.com",
+        UserRequestDTO dto = new UserRequestDTO("Juan", "12345678",
                 "pass123", UserRole.coordinador, true);
 
-        when(userRepository.existsByEmail("duplicado@mail.com")).thenReturn(true);
+        when(userRepository.existsByDni("12345678")).thenReturn(true);
 
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> userService.createUser(dto));
 
-        assertEquals("El email ya está registrado", exception.getMessage());
-        verify(userRepository, times(1)).existsByEmail("duplicado@mail.com");
+        assertEquals("El dni ya está registrado", exception.getMessage());
+        verify(userRepository, times(1)).existsByDni("12345678");
         verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
     void testUpdateUserSuccess() {
-        UserRequestDTO dto = new UserRequestDTO("Actualizado", "nuevo@mail.com",
+        UserRequestDTO dto = new UserRequestDTO("Actualizado", "12345678",
                 "newpass", UserRole.profesor, true);
         User existingUser = new User();
         existingUser.setId(1L);
@@ -170,7 +170,7 @@ class UserServiceImplTest {
 
     @Test
     void testUpdateUserNotFound() {
-        UserRequestDTO dto = new UserRequestDTO("Test", "test@mail.com",
+        UserRequestDTO dto = new UserRequestDTO("Test", "12345678",
                 "pass", UserRole.padre, true);
 
         when(userRepository.findById(99L)).thenReturn(Optional.empty());

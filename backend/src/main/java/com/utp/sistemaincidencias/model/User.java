@@ -22,11 +22,14 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "username", unique = true, nullable = false)
+    private String username;
+
     @Column(name = "name", nullable = false, length = 150)
     private String name;
 
-    @Column(name = "email", nullable = false, unique = true, length = 255)
-    private String email;
+    @Column(name = "dni", nullable = false, unique = true, length = 255)
+    private String dni;
 
     @Column(name = "password_hash", nullable = false, length = 255)
     private String passwordHash;

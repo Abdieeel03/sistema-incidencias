@@ -33,15 +33,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<User> getUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public Optional<User> getUserByDni(String dni) {
+        return userRepository.findByDni(dni);
     }
 
     @Override
     @Transactional
     public User createUser(UserRequestDTO dto) {
-        if (userRepository.existsByEmail(dto.getEmail())) {
-            throw new RuntimeException("El email ya está registrado");
+        if (userRepository.existsByDni(dto.getDni())) {
+            throw new RuntimeException("El dni ya está registrado");
         }
 
         User user = userMapper.toEntity(dto);

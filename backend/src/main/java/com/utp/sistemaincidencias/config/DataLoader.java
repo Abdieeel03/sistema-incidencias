@@ -34,122 +34,10 @@ public class DataLoader implements CommandLineRunner {
 
         log.info("🚀 Iniciando carga de datos base...");
 
-        // ── Coordinadores ──
-        List<User> coordinadores = createUsers(List.of(
-                new String[]{"Carlos Mendoza López", "carlos.mendoza@colegio.edu.pe"},
-                new String[]{"María Elena Quispe", "maria.quispe@colegio.edu.pe"},
-                new String[]{"Roberto Sánchez Díaz", "roberto.sanchez@colegio.edu.pe"}
-        ), UserRole.coordinador);
-        log.info("✅ {} coordinadores creados", coordinadores.size());
-
-        // ── Profesores ──
-        List<User> profesores = createUsers(List.of(
-                new String[]{"Ana García Flores", "ana.garcia@colegio.edu.pe"},
-                new String[]{"Luis Torres Vargas", "luis.torres@colegio.edu.pe"},
-                new String[]{"Carmen Ruiz Paredes", "carmen.ruiz@colegio.edu.pe"},
-                new String[]{"Jorge Castillo Ramos", "jorge.castillo@colegio.edu.pe"},
-                new String[]{"Patricia Herrera Luna", "patricia.herrera@colegio.edu.pe"},
-                new String[]{"Miguel Ángel Rojas", "miguel.rojas@colegio.edu.pe"},
-                new String[]{"Sofía Delgado Vega", "sofia.delgado@colegio.edu.pe"},
-                new String[]{"Fernando Morales Cruz", "fernando.morales@colegio.edu.pe"},
-                new String[]{"Isabel Navarro Pinto", "isabel.navarro@colegio.edu.pe"},
-                new String[]{"Ricardo Campos Silva", "ricardo.campos@colegio.edu.pe"}
-        ), UserRole.profesor);
-        log.info("✅ {} profesores creados", profesores.size());
-
-        // ── Padres ──
-        List<User> padres = createUsers(List.of(
-                new String[]{"Pedro Ramírez Huamán", "pedro.ramirez@gmail.com"},
-                new String[]{"Rosa Martínez Cáceres", "rosa.martinez@gmail.com"},
-                new String[]{"Juan Pablo Fernández", "juan.fernandez@gmail.com"},
-                new String[]{"Lucía Espinoza Ríos", "lucia.espinoza@gmail.com"},
-                new String[]{"Andrés Gutiérrez Peña", "andres.gutierrez@gmail.com"},
-                new String[]{"Diana Salazar Ochoa", "diana.salazar@gmail.com"},
-                new String[]{"Óscar Chávez Medina", "oscar.chavez@gmail.com"},
-                new String[]{"Elena Vargas Tapia", "elena.vargas@gmail.com"},
-                new String[]{"Héctor Núñez Castro", "hector.nunez@gmail.com"},
-                new String[]{"Claudia Ortiz Zamora", "claudia.ortiz@gmail.com"},
-                new String[]{"Manuel Flores Aguilar", "manuel.flores@gmail.com"},
-                new String[]{"Verónica Díaz Romero", "veronica.diaz@gmail.com"},
-                new String[]{"Raúl Paredes Benítez", "raul.paredes@gmail.com"},
-                new String[]{"Gabriela Jiménez Soto", "gabriela.jimenez@gmail.com"},
-                new String[]{"Alberto Reyes Lara", "alberto.reyes@gmail.com"},
-                new String[]{"Mónica Castro Mejía", "monica.castro@gmail.com"},
-                new String[]{"Enrique Peña Valdivia", "enrique.pena@gmail.com"},
-                new String[]{"Sandra López Miranda", "sandra.lopez@gmail.com"},
-                new String[]{"Julio Acosta Fuentes", "julio.acosta@gmail.com"},
-                new String[]{"Teresa Ríos Cornejo", "teresa.rios@gmail.com"}
-        ), UserRole.padre);
-        log.info("✅ {} padres creados", padres.size());
-
         // ── Estudiantes (40) ──
         List<Student> estudiantes = createStudents();
         log.info("✅ {} estudiantes creados", estudiantes.size());
 
-        // ── Secciones ──
-        List<Section> secciones = List.of(
-                createSection("A", "1° Secundaria", (short) 30, coordinadores.get(0)),
-                createSection("B", "1° Secundaria", (short) 30, coordinadores.get(0)),
-                createSection("A", "2° Secundaria", (short) 30, coordinadores.get(1)),
-                createSection("B", "2° Secundaria", (short) 30, coordinadores.get(1)),
-                createSection("A", "3° Secundaria", (short) 28, coordinadores.get(2)),
-                createSection("B", "3° Secundaria", (short) 28, coordinadores.get(2)),
-                createSection("A", "4° Secundaria", (short) 25, coordinadores.get(0)),
-                createSection("A", "5° Secundaria", (short) 25, coordinadores.get(1))
-        );
-        log.info("✅ {} secciones creadas", secciones.size());
-
-        // ── Clases (materias por sección) ──
-        String[] materias = {"Matemáticas", "Comunicación", "Ciencias Naturales", "Historia", "Inglés"};
-        int profIdx = 0;
-        int classCount = 0;
-        for (Section seccion : secciones) {
-            for (String materia : materias) {
-                User prof = profesores.get(profIdx % profesores.size());
-                createSchoolClass(materia + " - " + seccion.getGrade() + " " + seccion.getName(),
-                        "Curso de " + materia + " para " + seccion.getGrade() + " sección " + seccion.getName(),
-                        prof, seccion);
-                profIdx++;
-                classCount++;
-            }
-        }
-        log.info("✅ {} clases creadas", classCount);
-
-        // ── Relaciones Padre-Estudiante ──
-        int psCount = 0;
-        for (int i = 0; i < estudiantes.size(); i++) {
-            // Cada estudiante tiene al menos 1 padre, algunos tienen 2
-            User padre1 = padres.get(i % padres.size());
-            createParentStudent(padre1, estudiantes.get(i));
-            psCount++;
-
-            if (i % 3 == 0) { // ~1 de cada 3 tiene segundo padre
-                User padre2 = padres.get((i + 10) % padres.size());
-                if (!padre1.getId().equals(padre2.getId())) {
-                    createParentStudent(padre2, estudiantes.get(i));
-                    psCount++;
-                }
-            }
-        }
-        log.info("✅ {} relaciones padre-estudiante creadas", psCount);
-
-        log.info("🎉 Carga de datos completada exitosamente.");
-    }
-
-    // ── Métodos auxiliares ──
-
-    private List<User> createUsers(List<String[]> data, UserRole role) {
-        List<User> users = new ArrayList<>();
-        for (String[] d : data) {
-            User user = new User();
-            user.setName(d[0]);
-            user.setEmail(d[1]);
-            user.setPasswordHash("password123");
-            user.setRole(role);
-            user.setIsActive(true);
-            users.add(userRepository.save(user));
-        }
-        return users;
     }
 
     private List<Student> createStudents() {
@@ -207,30 +95,5 @@ public class DataLoader implements CommandLineRunner {
             students.add(studentRepository.save(s));
         }
         return students;
-    }
-
-    private Section createSection(String name, String grade, short capacity, User coordinator) {
-        Section section = new Section();
-        section.setName(name);
-        section.setGrade(grade);
-        section.setCapacity(capacity);
-        section.setCoordinator(coordinator);
-        return sectionRepository.save(section);
-    }
-
-    private void createSchoolClass(String name, String description, User teacher, Section section) {
-        SchoolClass sc = new SchoolClass();
-        sc.setName(name);
-        sc.setDescription(description);
-        sc.setTeacher(teacher);
-        sc.setSection(section);
-        schoolClassRepository.save(sc);
-    }
-
-    private void createParentStudent(User parent, Student student) {
-        ParentStudent ps = new ParentStudent();
-        ps.setParent(parent);
-        ps.setStudent(student);
-        parentStudentRepository.save(ps);
     }
 }

@@ -34,27 +34,28 @@ class UserControllerTest {
     @InjectMocks
     private UserController userController;
 
-    private User createUser(Long id, String name, String email) {
+    private User createUser(Long id, String username, String name, String dni) {
         User user = new User();
         user.setId(id);
+        user.setUsername(username);
         user.setName(name);
-        user.setEmail(email);
+        user.setDni(dni);
         user.setRole(UserRole.coordinador);
         user.setIsActive(true);
         return user;
     }
 
-    private UserResponseDTO createResponseDTO(Long id, String name, String email) {
+    private UserResponseDTO createResponseDTO(Long id, String username, String name, String dni) {
         LocalDateTime now = LocalDateTime.now();
-        return new UserResponseDTO(id, name, email, UserRole.coordinador, true, now, now);
+        return new UserResponseDTO(id, username, name, dni, UserRole.coordinador, true, now, now);
     }
 
     @Test
     void testGetAllUsers() {
-        User user1 = createUser(1L, "Juan", "juan@mail.com");
-        User user2 = createUser(2L, "Maria", "maria@mail.com");
-        UserResponseDTO dto1 = createResponseDTO(1L, "Juan", "juan@mail.com");
-        UserResponseDTO dto2 = createResponseDTO(2L, "Maria", "maria@mail.com");
+        User user1 = createUser(1L, "C123", "juan", "12345678");
+        User user2 = createUser(2L, "C456", "maria", "12345678");
+        UserResponseDTO dto1 = createResponseDTO(1L, "C123", "juan", "12345678");
+        UserResponseDTO dto2 = createResponseDTO(2L, "C456", "maria", "12345678");
 
         when(userService.getAllUsers()).thenReturn(Arrays.asList(user1, user2));
         when(userMapper.toResponseDTOList(Arrays.asList(user1, user2)))
@@ -70,8 +71,8 @@ class UserControllerTest {
 
     @Test
     void testGetUserByIdFound() {
-        User user = createUser(1L, "Juan", "juan@mail.com");
-        UserResponseDTO dto = createResponseDTO(1L, "Juan", "juan@mail.com");
+        User user = createUser(1L, "C123", "juan", "12345678");
+        UserResponseDTO dto = createResponseDTO(1L, "C123", "juan", "12345678");
 
         when(userService.getUserById(1L)).thenReturn(Optional.of(user));
         when(userMapper.toResponseDTO(user)).thenReturn(dto);
@@ -80,7 +81,7 @@ class UserControllerTest {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals("Juan", response.getBody().getName());
+        assertEquals("juan", response.getBody().getName());
     }
 
     @Test
@@ -95,34 +96,34 @@ class UserControllerTest {
 
     @Test
     void testGetUserByEmailFound() {
-        User user = createUser(1L, "Juan", "juan@mail.com");
-        UserResponseDTO dto = createResponseDTO(1L, "Juan", "juan@mail.com");
+        User user = createUser(1L, "C123", "juan", "12345678");
+        UserResponseDTO dto = createResponseDTO(1L, "C123", "juan", "12345678");
 
-        when(userService.getUserByEmail("juan@mail.com")).thenReturn(Optional.of(user));
+        when(userService.getUserByDni("12345678")).thenReturn(Optional.of(user));
         when(userMapper.toResponseDTO(user)).thenReturn(dto);
 
-        ResponseEntity<UserResponseDTO> response = userController.getUserByEmail("juan@mail.com");
+        ResponseEntity<UserResponseDTO> response = userController.getUserByDni("12345678");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals("juan@mail.com", response.getBody().getEmail());
+        assertEquals("12345678", response.getBody().getDni());
     }
 
     @Test
     void testGetUserByEmailNotFound() {
-        when(userService.getUserByEmail("noexiste@mail.com")).thenReturn(Optional.empty());
+        when(userService.getUserByDni("12345678")).thenReturn(Optional.empty());
 
-        ResponseEntity<UserResponseDTO> response = userController.getUserByEmail("noexiste@mail.com");
+        ResponseEntity<UserResponseDTO> response = userController.getUserByDni("12345678");
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     @Test
     void testCreateUser() {
-        UserRequestDTO requestDTO = new UserRequestDTO("Juan", "juan@mail.com",
+        UserRequestDTO requestDTO = new UserRequestDTO("Juan", "12345678",
                 "pass123", UserRole.coordinador, true);
-        User createdUser = createUser(1L, "Juan", "juan@mail.com");
-        UserResponseDTO responseDTO = createResponseDTO(1L, "Juan", "juan@mail.com");
+        User createdUser = createUser(1L, "C123", "juan", "12345678");
+        UserResponseDTO responseDTO = createResponseDTO(1L, "C123", "juan", "12345678");
 
         when(userService.createUser(requestDTO)).thenReturn(createdUser);
         when(userMapper.toResponseDTO(createdUser)).thenReturn(responseDTO);
@@ -136,10 +137,10 @@ class UserControllerTest {
 
     @Test
     void testUpdateUser() {
-        UserRequestDTO requestDTO = new UserRequestDTO("Actualizado", "nuevo@mail.com",
+        UserRequestDTO requestDTO = new UserRequestDTO("actualizado", "12345678",
                 "newpass", UserRole.profesor, true);
-        User updatedUser = createUser(1L, "Actualizado", "nuevo@mail.com");
-        UserResponseDTO responseDTO = createResponseDTO(1L, "Actualizado", "nuevo@mail.com");
+        User updatedUser = createUser(1L, "C123", "actualizado", "12345678");
+        UserResponseDTO responseDTO = createResponseDTO(1L, "C123", "actualizado", "12345678");
 
         when(userService.updateUser(1L, requestDTO)).thenReturn(updatedUser);
         when(userMapper.toResponseDTO(updatedUser)).thenReturn(responseDTO);
@@ -148,7 +149,7 @@ class UserControllerTest {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals("Actualizado", response.getBody().getName());
+        assertEquals("actualizado", response.getBody().getName());
     }
 
     @Test

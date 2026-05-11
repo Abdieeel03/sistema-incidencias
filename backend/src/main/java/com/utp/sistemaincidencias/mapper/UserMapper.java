@@ -20,8 +20,9 @@ public class UserMapper {
 
 		return new UserResponseDTO(
 				user.getId(),
+				user.getUsername(),
 				user.getName(),
-				user.getEmail(),
+				user.getDni(),
 				user.getRole(),
 				user.getIsActive(),
 				user.getCreatedAt(),
@@ -36,7 +37,7 @@ public class UserMapper {
 
 		User user = new User();
 		user.setName(dto.getName());
-		user.setEmail(dto.getEmail());
+		user.setDni(dto.getDni());
 		user.setRole(dto.getRole());
 		user.setIsActive(dto.getIsActive() != null ? dto.getIsActive() : true);
 		return user;
@@ -48,7 +49,7 @@ public class UserMapper {
 		}
 
 		user.setName(dto.getName());
-		user.setEmail(dto.getEmail());
+		user.setDni(dto.getDni());
 		user.setRole(dto.getRole());
 
 		if (dto.getIsActive() != null) {
