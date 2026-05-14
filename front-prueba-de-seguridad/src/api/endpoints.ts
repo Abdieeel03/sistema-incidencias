@@ -14,6 +14,13 @@ export const ENDPOINTS = {
     DELETED: `${API_BASE}/users/deleted`,
     RESTORE: (id: number) => `${API_BASE}/users/${id}/restore`,
     CHANGE_PASSWORD: `${API_BASE}/users/me/change-password`,
+    // Filtros por rol
+    TEACHERS: `${API_BASE}/users/teachers`,
+    TEACHERS_DELETED: `${API_BASE}/users/teachers/deleted`,
+    PARENTS: `${API_BASE}/users/parents`,
+    PARENTS_DELETED: `${API_BASE}/users/parents/deleted`,
+    // Actualización especial por coordinador
+    COORDINATOR_UPDATE: (id: number) => `${API_BASE}/users/coordinator/${id}`,
   },
 
   // Students — Requiere token
@@ -36,5 +43,17 @@ export const ENDPOINTS = {
     MY_CLASSES: `${API_BASE}/classes/my-classes`,
     STUDENTS: (id: number) => `${API_BASE}/classes/${id}/students`,
     RESTORE: (id: number) => `${API_BASE}/classes/restore/${id}`,
+  },
+
+  // Incidents — Requiere token
+  INCIDENTS: {
+    BASE: `${API_BASE}/incidents`,
+    BY_ID: (id: number) => `${API_BASE}/incidents/${id}`,
+    DELETED: `${API_BASE}/incidents/deleted`,
+    MY_INCIDENTS: `${API_BASE}/incidents/my-incidents`,
+    BY_STUDENT: (studentId: number) => `${API_BASE}/incidents/student/${studentId}`,
+    BY_CLASS: (classId: number) => `${API_BASE}/incidents/class/${classId}`,
+    MARK_READ: (id: number) => `${API_BASE}/incidents/${id}/read`,
+    RESTORE: (id: number) => `${API_BASE}/incidents/restore/${id}`,
   },
 } as const;

@@ -11,38 +11,69 @@ export function DashboardPage() {
       'DELETE /api/users/{id}',
       'GET /api/users/deleted',
       'PATCH /api/users/{id}/restore',
+      'GET /api/users/teachers',
+      'GET /api/users/teachers/deleted',
+      'GET /api/users/parents',
+      'GET /api/users/parents/deleted',
       'GET /api/students',
       'POST /api/students',
       'PUT /api/students/{id}',
       'DELETE /api/students/{id}',
       'GET /api/students/deleted',
+      'GET /api/students/{id}/details',
       'GET /api/classes',
       'GET /api/classes/{id}',
+      'GET /api/incidents',
+      'GET /api/incidents/{id}',
+      'GET /api/incidents/class/{id}',
     ],
     COORDINADOR: [
       'GET /api/users',
       'POST /api/users',
       'PUT /api/users/{id}',
+      'PUT /api/users/coordinator/{id}',
       'GET /api/users/deleted',
       'PATCH /api/users/{id}/restore',
+      'GET /api/users/teachers',
+      'GET /api/users/teachers/deleted',
+      'GET /api/users/parents',
+      'GET /api/users/parents/deleted',
       'GET /api/students',
       'POST /api/students',
       'PUT /api/students/{id}',
       'DELETE /api/students/{id}',
+      'GET /api/students/deleted',
+      'GET /api/students/{id}/details',
       'GET /api/classes',
       'POST /api/classes',
       'PUT /api/classes/{id}',
       'DELETE /api/classes/{id}',
+      'GET /api/incidents',
+      'GET /api/incidents/{id}',
+      'GET /api/incidents/deleted',
+      'GET /api/incidents/class/{id}',
     ],
     PROFESOR: [
       'GET /api/classes/my-classes',
       'GET /api/classes/{id}',
       'GET /api/classes/{id}/students',
       'GET /api/students/{id}/details',
+      'POST /api/incidents',
+      'GET /api/incidents/my-incidents',
+      'GET /api/incidents/{id}',
+      'PUT /api/incidents/{id}',
+      'DELETE /api/incidents/{id}',
+      'GET /api/incidents/deleted',
+      'PUT /api/incidents/restore/{id}',
+      'GET /api/incidents/class/{id}',
+      'GET /api/incidents/student/{id}',
     ],
     PADRE: [
       'GET /api/students/my-children',
       'GET /api/students/{id}/details',
+      'GET /api/incidents/student/{id}',
+      'GET /api/incidents/{id}',
+      'PATCH /api/incidents/{id}/read',
     ],
   };
 
@@ -88,7 +119,7 @@ export function DashboardPage() {
 
         <div className="card">
           <div className="card-header">
-            <h2>🔗 Endpoints Disponibles ({role})</h2>
+            <h2>🔗 Endpoints Disponibles ({role}) — {availableEndpoints.length} endpoints</h2>
           </div>
           <div className="endpoints-list">
             {availableEndpoints.map((ep, i) => {
@@ -129,6 +160,10 @@ export function DashboardPage() {
               <a href="http://localhost:8080/swagger-ui/index.html" target="_blank" rel="noopener noreferrer" className="info-value link">
                 /swagger-ui/index.html
               </a>
+            </div>
+            <div className="info-item">
+              <span className="info-label">Módulos</span>
+              <span className="info-value">Auth · Users · Students · Classes · Incidents</span>
             </div>
           </div>
         </div>

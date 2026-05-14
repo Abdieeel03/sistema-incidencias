@@ -1,12 +1,16 @@
 import type { IncidentStatus } from './common.types';
 
 // ========== Request DTOs ==========
+
+/**
+ * Crear incidencia — Solo PROFESOR.
+ * NOTA: teacherId NO se envía, se extrae automáticamente del JWT del profesor autenticado.
+ */
 export interface CreateIncidentRequest {
   title: string;
   description: string;
   studentId: number;
   classId: number;
-  teacherId: number;
 }
 
 export interface UpdateIncidentRequest {

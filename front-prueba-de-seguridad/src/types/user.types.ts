@@ -20,6 +20,15 @@ export interface ChangePasswordRequest {
   confirmPassword: string;
 }
 
+/**
+ * Actualización especial por Coordinador.
+ * Permite cambiar dni y role sin modificar nombre/email.
+ */
+export interface CoordinatorUpdateUserRequest {
+  dni: string;
+  role: Role;
+}
+
 // ========== Response DTOs ==========
 export interface UserResponse {
   id: number;

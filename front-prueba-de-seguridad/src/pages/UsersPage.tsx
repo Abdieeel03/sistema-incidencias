@@ -24,6 +24,10 @@ export function UsersPage() {
   const [updateEmail, setUpdateEmail] = useState('');
   const [updateName, setUpdateName] = useState('');
 
+  // Coordinator update state
+  const [coordDni, setCoordDni] = useState('');
+  const [coordRole, setCoordRole] = useState<Role>(Role.PROFESOR);
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const exec = async (fn: () => Promise<FetchResult<any>>) => {
     setLoading(true);
@@ -52,13 +56,26 @@ export function UsersPage() {
     }));
   };
 
+  const handleCoordUpdate = (e: FormEvent) => {
+    e.preventDefault();
+    exec(() => userService.coordinatorUpdate(Number(targetId), {
+      dni: coordDni,
+      role: coordRole,
+    }));
+  };
+
   const sections = [
     { key: 'list', label: 'Listar', method: 'GET', path: '/api/users' },
     { key: 'create', label: 'Crear', method: 'POST', path: '/api/users' },
     { key: 'getById', label: 'Por ID', method: 'GET', path: '/api/users/{id}' },
     { key: 'update', label: 'Actualizar', method: 'PUT', path: '/api/users/{id}' },
+    { key: 'coordUpdate', label: 'Coord. Update', method: 'PUT', path: '/api/users/coordinator/{id}' },
     { key: 'delete', label: 'Eliminar', method: 'DELETE', path: '/api/users/{id}' },
+    { key: 'teachers', label: 'Profesores', method: 'GET', path: '/api/users/teachers' },
+    { key: 'parents', label: 'Padres', method: 'GET', path: '/api/users/parents' },
     { key: 'deleted', label: 'Eliminados', method: 'GET', path: '/api/users/deleted' },
+    { key: 'teachersDeleted', label: 'Prof. Eliminados', method: 'GET', path: '/api/users/teachers/deleted' },
+    { key: 'parentsDeleted', label: 'Padres Eliminados', method: 'GET', path: '/api/users/parents/deleted' },
     { key: 'restore', label: 'Restaurar', method: 'PATCH', path: '/api/users/{id}/restore' },
   ];
 
@@ -66,7 +83,7 @@ export function UsersPage() {
     <div className="page">
       <div className="page-header">
         <h1>👤 Gestión de Usuarios</h1>
-        <p>Endpoints CRUD para usuarios — Requiere rol ADMIN o COORDINADOR</p>
+        <p>Endpoints CRUD para usuarios — Incluye filtros por rol y actualización por coordinador</p>
       </div>
 
       <div className="section-tabs">
@@ -90,6 +107,7 @@ export function UsersPage() {
               <h2>Listar Usuarios</h2>
               <code className="endpoint-badge">GET /api/users</code>
             </div>
+            <p className="role-hint">🔒 Roles: ADMIN, COORDINADOR</p>
             <button className="btn btn-primary" onClick={() => exec(() => userService.getAll())} disabled={loading}>
               {loading ? 'Cargando...' : 'Ejecutar'}
             </button>
@@ -104,6 +122,7 @@ export function UsersPage() {
               <h2>Crear Usuario</h2>
               <code className="endpoint-badge">POST /api/users</code>
             </div>
+            <p className="role-hint">🔒 Roles: ADMIN, COORDINADOR</p>
             <form onSubmit={handleCreate} className="form">
               <div className="form-row">
                 <div className="form-group">
@@ -149,6 +168,7 @@ export function UsersPage() {
               <h2>Obtener Usuario por ID</h2>
               <code className="endpoint-badge">GET /api/users/{'id'}</code>
             </div>
+            <p className="role-hint">🔒 Roles: ADMIN, COORDINADOR</p>
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="get-user-id">ID del usuario</label>
@@ -169,6 +189,7 @@ export function UsersPage() {
               <h2>Actualizar Usuario</h2>
               <code className="endpoint-badge">PUT /api/users/{'id'}</code>
             </div>
+            <p className="role-hint">🔒 Roles: ADMIN, COORDINADOR — Actualiza email y nombre</p>
             <form onSubmit={handleUpdate} className="form">
               <div className="form-group">
                 <label htmlFor="update-user-id">ID del usuario</label>
@@ -192,6 +213,42 @@ export function UsersPage() {
           </div>
         )}
 
+        {/* COORDINATOR UPDATE */}
+        {activeSection === 'coordUpdate' && (
+          <div className="card">
+            <div className="card-header">
+              <h2>Actualización por Coordinador</h2>
+              <code className="endpoint-badge">PUT /api/users/coordinator/{'id'}</code>
+            </div>
+            <p className="role-hint">🔒 Rol: COORDINADOR — Actualiza DNI y rol sin modificar nombre/email</p>
+            <form onSubmit={handleCoordUpdate} className="form">
+              <div className="form-group">
+                <label htmlFor="coord-update-id">ID del usuario</label>
+                <input id="coord-update-id" type="number" placeholder="1" value={targetId} onChange={(e) => setTargetId(e.target.value)} required min={1} />
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="coord-dni">Nuevo DNI (8 dígitos)</label>
+                  <input id="coord-dni" type="text" placeholder="87654321" value={coordDni} onChange={(e) => setCoordDni(e.target.value)} required pattern="\d{8}" maxLength={8} />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="coord-role">Nuevo Rol</label>
+                  <select id="coord-role" value={coordRole} onChange={(e) => setCoordRole(e.target.value as Role)}>
+                    <option value={Role.ADMIN}>ADMIN</option>
+                    <option value={Role.COORDINADOR}>COORDINADOR</option>
+                    <option value={Role.PROFESOR}>PROFESOR</option>
+                    <option value={Role.PADRE}>PADRE</option>
+                  </select>
+                </div>
+              </div>
+              <button type="submit" className="btn btn-primary" disabled={loading}>
+                {loading ? 'Actualizando...' : 'Actualizar (Coordinador)'}
+              </button>
+            </form>
+            <ResponseViewer result={result} loading={loading} />
+          </div>
+        )}
+
         {/* DELETE */}
         {activeSection === 'delete' && (
           <div className="card">
@@ -199,7 +256,7 @@ export function UsersPage() {
               <h2>Eliminar Usuario (Soft Delete)</h2>
               <code className="endpoint-badge">DELETE /api/users/{'id'}</code>
             </div>
-            <p className="warning-text">⚠️ Solo ADMIN puede eliminar usuarios</p>
+            <p className="role-hint">🔒 Rol: Solo ADMIN</p>
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="delete-user-id">ID del usuario</label>
@@ -213,15 +270,76 @@ export function UsersPage() {
           </div>
         )}
 
-        {/* DELETED USERS */}
+        {/* LISTAR PROFESORES */}
+        {activeSection === 'teachers' && (
+          <div className="card">
+            <div className="card-header">
+              <h2>Listar Profesores</h2>
+              <code className="endpoint-badge">GET /api/users/teachers</code>
+            </div>
+            <p className="role-hint">🔒 Roles: ADMIN, COORDINADOR</p>
+            <button className="btn btn-primary" onClick={() => exec(() => userService.getTeachers())} disabled={loading}>
+              {loading ? 'Cargando...' : 'Listar Profesores'}
+            </button>
+            <ResponseViewer result={result} loading={loading} />
+          </div>
+        )}
+
+        {/* LISTAR PADRES */}
+        {activeSection === 'parents' && (
+          <div className="card">
+            <div className="card-header">
+              <h2>Listar Padres</h2>
+              <code className="endpoint-badge">GET /api/users/parents</code>
+            </div>
+            <p className="role-hint">🔒 Roles: ADMIN, COORDINADOR</p>
+            <button className="btn btn-primary" onClick={() => exec(() => userService.getParents())} disabled={loading}>
+              {loading ? 'Cargando...' : 'Listar Padres'}
+            </button>
+            <ResponseViewer result={result} loading={loading} />
+          </div>
+        )}
+
+        {/* USUARIOS ELIMINADOS */}
         {activeSection === 'deleted' && (
           <div className="card">
             <div className="card-header">
               <h2>Usuarios Eliminados</h2>
               <code className="endpoint-badge">GET /api/users/deleted</code>
             </div>
+            <p className="role-hint">🔒 Roles: ADMIN, COORDINADOR</p>
             <button className="btn btn-primary" onClick={() => exec(() => userService.getDeleted())} disabled={loading}>
               {loading ? 'Cargando...' : 'Listar Eliminados'}
+            </button>
+            <ResponseViewer result={result} loading={loading} />
+          </div>
+        )}
+
+        {/* PROFESORES ELIMINADOS */}
+        {activeSection === 'teachersDeleted' && (
+          <div className="card">
+            <div className="card-header">
+              <h2>Profesores Eliminados</h2>
+              <code className="endpoint-badge">GET /api/users/teachers/deleted</code>
+            </div>
+            <p className="role-hint">🔒 Roles: ADMIN, COORDINADOR</p>
+            <button className="btn btn-primary" onClick={() => exec(() => userService.getTeachersDeleted())} disabled={loading}>
+              {loading ? 'Cargando...' : 'Listar Profesores Eliminados'}
+            </button>
+            <ResponseViewer result={result} loading={loading} />
+          </div>
+        )}
+
+        {/* PADRES ELIMINADOS */}
+        {activeSection === 'parentsDeleted' && (
+          <div className="card">
+            <div className="card-header">
+              <h2>Padres Eliminados</h2>
+              <code className="endpoint-badge">GET /api/users/parents/deleted</code>
+            </div>
+            <p className="role-hint">🔒 Roles: ADMIN, COORDINADOR</p>
+            <button className="btn btn-primary" onClick={() => exec(() => userService.getParentsDeleted())} disabled={loading}>
+              {loading ? 'Cargando...' : 'Listar Padres Eliminados'}
             </button>
             <ResponseViewer result={result} loading={loading} />
           </div>
@@ -234,6 +352,7 @@ export function UsersPage() {
               <h2>Restaurar Usuario</h2>
               <code className="endpoint-badge">PATCH /api/users/{'id'}/restore</code>
             </div>
+            <p className="role-hint">🔒 Roles: ADMIN, COORDINADOR</p>
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="restore-user-id">ID del usuario</label>

@@ -1,6 +1,12 @@
 import { authFetch } from '../api/client';
 import { ENDPOINTS } from '../api/endpoints';
-import type { CreateUserRequest, UpdateUserRequest, ChangePasswordRequest, UserResponse } from '../types/user.types';
+import type {
+  CreateUserRequest,
+  UpdateUserRequest,
+  ChangePasswordRequest,
+  CoordinatorUpdateUserRequest,
+  UserResponse,
+} from '../types/user.types';
 
 export const userService = {
   getAll() {
@@ -15,6 +21,26 @@ export const userService = {
     return authFetch<UserResponse[]>(ENDPOINTS.USERS.DELETED);
   },
 
+  /** GET /api/users/teachers — Solo profesores */
+  getTeachers() {
+    return authFetch<UserResponse[]>(ENDPOINTS.USERS.TEACHERS);
+  },
+
+  /** GET /api/users/teachers/deleted — Profesores eliminados */
+  getTeachersDeleted() {
+    return authFetch<UserResponse[]>(ENDPOINTS.USERS.TEACHERS_DELETED);
+  },
+
+  /** GET /api/users/parents — Solo padres */
+  getParents() {
+    return authFetch<UserResponse[]>(ENDPOINTS.USERS.PARENTS);
+  },
+
+  /** GET /api/users/parents/deleted — Padres eliminados */
+  getParentsDeleted() {
+    return authFetch<UserResponse[]>(ENDPOINTS.USERS.PARENTS_DELETED);
+  },
+
   create(data: CreateUserRequest) {
     return authFetch<UserResponse>(ENDPOINTS.USERS.BASE, {
       method: 'POST',
@@ -24,6 +50,14 @@ export const userService = {
 
   update(id: number, data: UpdateUserRequest) {
     return authFetch<UserResponse>(ENDPOINTS.USERS.BY_ID(id), {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /** PUT /api/users/coordinator/{id} — Actualización especial por coordinador (dni + role) */
+  coordinatorUpdate(id: number, data: CoordinatorUpdateUserRequest) {
+    return authFetch<UserResponse>(ENDPOINTS.USERS.COORDINATOR_UPDATE(id), {
       method: 'PUT',
       body: JSON.stringify(data),
     });
