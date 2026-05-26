@@ -1,0 +1,43 @@
+import React from 'react';
+
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  isLoading?: boolean;
+}
+
+export const Button: React.FC<ButtonProps> = ({
+  children,
+  variant = 'primary',
+  size = 'md',
+  isLoading = false,
+  className = '',
+  disabled,
+  ...props
+}) => {
+  return (
+    <button
+      className={`btn btn-${variant} btn-${size} ${className}`}
+      disabled={disabled || isLoading}
+      {...props}
+    >
+      {isLoading ? (
+        <>
+          <span className="spinner-loader" style={{
+            width: '14px',
+            height: '14px',
+            border: '2px solid currentColor',
+            borderBottomColor: 'transparent',
+            borderRadius: '50%',
+            display: 'inline-block',
+            animation: 'rotation 1s linear infinite'
+          }}></span>
+          Cargando...
+        </>
+      ) : (
+        children
+      )}
+    </button>
+  );
+};
+export default Button;
