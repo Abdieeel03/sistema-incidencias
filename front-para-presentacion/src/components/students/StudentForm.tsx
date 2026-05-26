@@ -104,7 +104,8 @@ export const StudentForm: React.FC<StudentFormProps> = ({
         label="DNI"
         placeholder="8 dígitos"
         value={dni}
-        onChange={(e) => setDni(e.target.value.replace(/\D/g, ''))}
+        onChange={(e) => setDni(e.target.value.replace(/\D/g, '').slice(0, 8))}
+        maxLength={8}
         error={errors.dni}
         disabled={isLoading}
       />
