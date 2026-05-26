@@ -12,7 +12,7 @@ export const RegisterPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [dni, setDni] = useState('');
   const [password, setPassword] = useState('');
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -22,7 +22,7 @@ export const RegisterPage: React.FC = () => {
   const validate = () => {
     const tempErrors: Record<string, string> = {};
     if (!name.trim()) tempErrors.name = 'El nombre completo es obligatorio';
-    
+
     if (!email.trim()) {
       tempErrors.email = 'El correo electrónico es obligatorio';
     } else if (!/\S+@\S+\.\S+/.test(email)) {
